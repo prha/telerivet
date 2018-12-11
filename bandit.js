@@ -12,10 +12,19 @@ exports.choose = function(apiKey, branch) {
     _headers(apiKey),
   );
   var option = response.selected;
-  api.post(`${BANDIT_URL}/log/${option}/impression/`, _headers(apiKey));
   return option;
 };
 
-exports.success = function(apiKey, option) {
+exports.logState = function(apiKey, state, option) {
+  if (contact.vars._bandit) {
+    contact.vars._bandit[state] = option;
+  } else {
+    contact.vars._bandit = {[state]: option};
+  }
+  api.post(`${BANDIT_URL}/log/${option}/impression/`, _headers(apiKey));
+};
+
+exports.success = function(apiKey, state) {
+  option = contact.vars._bandit[state];
   api.post(`${BANDIT_URL}/log/${option}/conversion/`, _headers(apiKey));
 };
